@@ -2,7 +2,7 @@
 set -e
 
 cleanup() {
-  gcloud container clusters resize $CLUSTER_NAME --node-pool $POOL_NAME --num-nodes 0 --project $PROJECT_ID --zone $ZONE --quiet
+  gcloud container clusters resize primary --node-pool gpu --num-nodes 0 --project primehub-demo --zone asia-east1-c --quiet
 
   if [[ "${PRIMEHUB_MODE}" == "ee" ]]; then
     echo "delete created phschedule"
@@ -148,7 +148,7 @@ fi
 
 # e2e test
 gcloud auth activate-service-account gitlab-ci@primehub-demo.iam.gserviceaccount.com --key-file=<(echo $GCP_SA_JSON_PRIMEHUB_DEMO)
-gcloud container clusters resize $CLUSTER_NAME --node-pool $POOL_NAME --num-nodes 1 --project $PROJECT_ID --zone $ZONE --quiet
+gcloud container clusters resize primary --node-pool gpu --num-nodes 1 --project primehub-demo --zone asia-east1-c --quiet
 
 # split the grep output of 'KC_REALM: ...' by space
 KC_REALM_DEPLOY="$(cut -d' ' -f2 <<< $(kubectl describe deploy -n hub primehub-console | grep KC_REALM))"
@@ -170,4 +170,4 @@ fi
 ~/project/node_modules/cucumber/bin/cucumber-js tests/features/ -f json:tests/report/cucumber_report.json --tags "$tags"
 node tests/report/generate_e2e_report.js
 
-gcloud container clusters resize $CLUSTER_NAME --node-pool $POOL_NAME --num-nodes 0 --project $PROJECT_ID --zone $ZONE --quiet
+gcloud container clusters resize primary --node-pool gpu --num-nodes 0 --project primehub-demo --zone asia-east1-c --quiet
